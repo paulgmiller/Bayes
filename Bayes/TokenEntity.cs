@@ -21,6 +21,7 @@ namespace Bayes
 
         public long Postives { get; set; }
         public long Total { get; set; }
+        public double Probabilty => Postives / Total;
 
         TokenEntity Merge(TokenEntity other)
         {
