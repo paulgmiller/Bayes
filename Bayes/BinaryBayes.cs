@@ -2,9 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
-using System.Collections.Generic;
 using System.Threading.Tasks;
-using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using Microsoft.WindowsAzure.Storage;
@@ -14,8 +12,8 @@ namespace Bayes
 {
     public class Corpus
     {
-        public List<string> Positives;
-        public List<string> Negatves;
+        public List<string> Positives = new List<string>();
+        public List<string> Negatives =  new List<string>();
         public string Details;
     }
 
@@ -51,8 +49,8 @@ namespace Bayes
             //don't sure we neeed this or not. Skipping unique&total word count
             var doctoken = GetOrCreateToken(tokendict, DocumentToken);
             doctoken.Postives += c.Positives.Count();
-            doctoken.Negatives += c.Negatves.Count();
-            updates.Add(Update(doctoken, c.Positives.Count(), c.Negatves.Count()));
+            doctoken.Negatives += c.Negatives.Count();
+            updates.Add(Update(doctoken, c.Positives.Count(), c.Negatives.Count()));
 
             await Task.WhenAll(updates);
         }
