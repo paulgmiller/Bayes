@@ -45,6 +45,8 @@
                 var bb = new BinaryBayes(t, parameters.classification);
                 return await bb.Classify(input);
             };
+
+            Get["/health"]= p => "damn right";
         }
 
         public async Task<string> SaveAndTrain(string classification, Corpus c)
