@@ -41,6 +41,10 @@ namespace Bayes
             merged.Negatives = Negatives + neg;
             return merged;
         }
+        public override string ToString()
+        {
+            return Classification + " " + Token;
+        }
     }
 }
  

@@ -29,7 +29,7 @@ namespace Bayes
         private readonly static string DocumentToken = "_document";
         //private readonly static string WordToken = "_word";
 
-        public async Task Train(Corpus c)
+        public async Task<IEnumerable<TokenEntity>> Train(Corpus c)
         {
             var pwords = Histogram(c.Positives.SelectMany(p => WordBreak(p)));
             var nwords = Histogram(c.Positives.SelectMany(p => WordBreak(p)));
@@ -39,7 +39,7 @@ namespace Bayes
             var knowntokens = await GetTokens(table, words);
             var tokendict = knowntokens.ToDictionary(t => t.Token, t => t);
 
-            var updates = new List<Task>();
+            var updates = new List<Task<TokenEntity>>();
             foreach (var word in words)
             {
                 var token = GetOrCreateToken(tokendict, word);
@@ -52,7 +52,7 @@ namespace Bayes
             doctoken.Negatives += c.Negatives.Count();
             updates.Add(Update(doctoken, c.Positives.Count(), c.Negatives.Count()));
 
-            await Task.WhenAll(updates);
+            return await Task.WhenAll(updates);
         }
 
         public async Task<double> Classify(string input)
@@ -61,7 +61,7 @@ namespace Bayes
             return tokens.Aggregate(1.0, (current, next) => current * next.Probabilty);
         }
 
-        private async Task Update(TokenEntity orig, long pos, long neg)
+        private async Task<TokenEntity> Update(TokenEntity orig, long pos, long neg)
         {
 
             var table = _table();
@@ -72,6 +72,7 @@ namespace Bayes
                 {
                     var newtoken = orig.Increment(pos, neg);
                     await table.ExecuteAsync(TableOperation.InsertOrReplace(newtoken));
+                    return newtoken;
                 }
                 catch (StorageException ex)
                 {
@@ -83,6 +84,7 @@ namespace Bayes
                     orig = await GetToken(table, orig.Token);
                 }
             } while (backoff < 256);
+            throw new Exception("failed to update " + orig);
         }
 
         private TokenEntity GetOrCreateToken(Dictionary<string, TokenEntity> dict, string tokenkey)

@@ -22,7 +22,7 @@
                 return HttpStatusCode.OK;
             };
 
-            Post["/ptrain/{classification}", true] = async (parameters, ct) =>
+            Get["/ptrain/{classification}", true] = async (parameters, ct) =>
             {
                 var c = new Corpus();
                 c.Positives.Add(this.Request.Query["input"]);
@@ -30,7 +30,7 @@
                 return HttpStatusCode.OK;
             };
 
-            Post["/ntrain/{classification}", true] = async (parameters, ct) =>
+            Get["/ntrain/{classification}", true] = async (parameters, ct) =>
             {
                 var c = new Corpus();
                 c.Negatives.Add(this.Request.Query["input"]);
@@ -47,13 +47,13 @@
             };
         }
 
-        public async Task SaveAndTrain(string classification, Corpus c)
+        public async Task<string> SaveAndTrain(string classification, Corpus c)
         {
             Func<CloudTable> t = BayesTable;
             var bb = new BinaryBayes(t, classification);
             var corpi = Corpi(classification);
             await corpi.UploadTextAsync(JsonConvert.SerializeObject(c));
-            await bb.Train(c);
+            return JsonConvert.SerializeObject(await bb.Train(c));
         }
         private CloudTable BayesTable()
         {
