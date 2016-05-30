@@ -147,6 +147,8 @@ namespace Bayes
         static readonly Regex r = new Regex(@"\w+");
 
         //do something non amuteur
+        //normalize numbers.
+        //pull out hyperlinks
         private IEnumerable<string> WordBreak(string input)
         {
             var matches = r.Matches(input.ToLower());

@@ -18,24 +18,21 @@
             Post["/train/{classification}", true] = async (parameters, ct) =>
             {
                 Corpus corpus = this.Bind();
-                await SaveAndTrain(parameters.classification, corpus);
-                return HttpStatusCode.OK;
+                return await SaveAndTrain(parameters.classification, corpus);
             };
 
             Get["/ptrain/{classification}", true] = async (parameters, ct) =>
             {
                 var c = new Corpus();
                 c.Positives.Add(this.Request.Query["input"]);
-                await SaveAndTrain(parameters.classification, c);
-                return HttpStatusCode.OK;
+                return await SaveAndTrain(parameters.classification, c);
             };
 
             Get["/ntrain/{classification}", true] = async (parameters, ct) =>
             {
                 var c = new Corpus();
                 c.Negatives.Add(this.Request.Query["input"]);
-                await SaveAndTrain(parameters.classification, c);
-                return HttpStatusCode.OK;
+                return await SaveAndTrain(parameters.classification, c);
             };
 
             Get["/classify/{classification}", true] = async (parameters, ct) =>
